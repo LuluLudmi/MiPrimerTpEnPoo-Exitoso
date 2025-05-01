@@ -1,0 +1,73 @@
+Clase padre
+public abstract class Vehiculo {
+    private String color;
+    private String marca;
+    private String modelo;
+    private Double precio; // puede ser null si no tiene precio
+    private Radio radio;
+
+    public Vehiculo(String color, String marca, String modelo, double precio) {
+        this.color = color;
+        this.marca = marca;
+        this.modelo = modelo;
+        this.precio = precio;
+
+    }
+
+    // Declara un método abstracto que deben implementar las clases hijas.
+    public abstract String getTipoVehiculo();
+
+    // Es un getter que devuelve la radio actual del vehículo (puede ser null si no
+    // tiene radio).
+    public Radio getRadio() { // no es necesario ponerlo si ya esta arriba
+        return this.radio;
+    }
+
+    // Este método setRadio(Radio radio)permite agregar, cambiar o quitar una radio
+    // a un objeto de tipo Vehiculo sin olvidar una serie de validaciones
+
+    public void setRadio(Radio radio) {
+        switch (radio == null ? "null" : radio.getDisponible() ? "disponible" : "ocupada") { // operador ternario. Buscar mas info
+            case "null":
+                // Se remueve la radio actual
+                if (this.radio != null) {
+                    this.radio.setDisponible(true); // liberar la que tenía antes
+                }
+                this.radio = null;
+                break;
+
+            case "ocupada":
+                // La radio ya está en uso: detenemos el programa con un error
+               System.out.println("La radio no esta disponible" );
+            // evita que el sistema(conjunto de clases y objetos que estamos programando)
+            // quede en un estado inválido, sin darnos cuenta.
+            case "disponible":
+                // Si el vehículo ya tenía una radio, liberarla
+                if (this.radio != null) {
+                    this.radio.setDisponible(true);
+                }
+
+                this.radio = radio;
+                radio.setDisponible(false);
+                break;
+        }
+    }
+
+}
+Clase hija AutoNuevo
+public class AutoNuevo extends Vehiculo {
+    public AutoNuevo(String color, String marca, String modelo, Double precio, Radio radio) {
+        super(color, marca, modelo, precio);
+
+        if (radio == null || ! radio.getDisponible()) {
+            throw new IllegalArgumentException("ERROR: No se puede crear un Auto Nuevo sin radio.");
+        }
+        setRadio(radio); // Asignación válida
+    }
+
+    @Override
+    public String getTipoVehiculo() {
+        return "Auto Nuevo";
+    }
+}
+CORREGIR EL TEMA DEL PRECIO. QUE PASA SI PONGO UN PRECIO NULL. AL SER UN DATO PRIMITIVO ME DEJA PASAR ESE ERROR, VER COMO EVITARLO.
