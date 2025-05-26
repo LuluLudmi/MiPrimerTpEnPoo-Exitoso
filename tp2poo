@@ -1,0 +1,349 @@
+package SegundaActividad.AguadaGilma.entidades;
+
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor; // Necesario para la herencia con Lombok y un constructor vacío
+import lombok.ToString;
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+
+/**
+ * Clase abstracta que representa un vehículo genérico en la concesionaria.
+ * Sirve como base para tipos específicos de vehículos como autos y motos.
+ * Implementa la interfaz Comparable para definir un orden natural por marca,
+ * modelo y precio.
+ */
+
+@Getter // Genera getters para todos los campos
+@NoArgsConstructor // Genera constructor sin argumentos
+@AllArgsConstructor // Genera constructor con todos los argumentos (marca, modelo, precio)
+@EqualsAndHashCode // Genera equals y hashCode (incluye campos de la superclase si se sobreescribe)
+@ToString(includeFieldNames = false) // Lombok generará toString, pero lo sobrescribiremos para el formato
+public abstract class Vehiculo implements Comparable<Vehiculo> {
+    protected String marca;
+    protected String modelo;
+    protected double precio;
+
+    // Aunque Lombok genera toString, lo sobrescribimos para el formato específico
+    @Override
+    public String toString() {
+        // Configuramos DecimalFormatSymbols para asegurar ',' como separador decimal
+        // y '.' como separador de miles, sin depender del Locale por defecto.
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator(',');
+        symbols.setGroupingSeparator('.');
+        DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
+
+        return "Marca: " + marca + " // Modelo: " + modelo + " // Precio: $" + df.format(precio);
+    }
+
+    /**
+     * Compara este vehículo con otro vehículo para establecer un orden natural.
+     * La comparación se realiza primero por marca, luego por modelo y finalmente
+     * por precio.
+     * Esto implementa el método compareTo de la interfaz Comparable.
+     * 
+     * @param otroVehiculo El otro objeto Vehiculo con el que se va a comparar.
+     * @return Un valor negativo si este vehículo es "menor" que el especificado,
+     *         cero si son "iguales", o un valor positivo si este vehículo es
+     *         "mayor".
+     */
+
+    @Override
+    public int compareTo(Vehiculo otroVehiculo) {
+        int resultadoMarca = this.marca.compareTo(otroVehiculo.marca);
+        if (resultadoMarca != 0) {
+            return resultadoMarca;
+        }
+        int resultadoModelo = this.modelo.compareTo(otroVehiculo.modelo);
+        if (resultadoModelo != 0) {
+            return resultadoModelo;
+        }
+        return Double.compare(this.precio, otroVehiculo.precio);
+    }
+}
+Clase hijas
+ackage SegundaActividad.AguadaGilma.entidades;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor; // Necesario para la herencia con Lombok y un constructor vacío
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+
+/**
+ * Clase que representa un Auto, extendiendo la clase abstracta Vehiculo.
+ * Contiene información específica de un auto, como el número de puertas.
+ */
+
+@Getter // Genera getters para 'puertas'
+@NoArgsConstructor // Genera constructor sin argumentos
+@EqualsAndHashCode(callSuper = true) // Incluye campos de la superclase en equals y hashCode
+@ToString(callSuper = true, includeFieldNames = false) // Lombok generará toString, pero lo sobrescribiremos
+public class Auto extends Vehiculo {
+    private int puertas;
+
+    /**
+     * Constructor para crear una instancia de Auto.
+     *
+     * @param marca   La marca del auto.
+     * @param modelo  El modelo del auto.
+     * @param precio  El precio del auto.
+     * @param puertas El número de puertas del auto.
+     */
+    public Auto(String marca, String modelo, double precio, int puertas) {
+        super(marca, modelo, precio); // Llama al constructor de la clase padre
+        this.puertas = puertas;
+    }
+
+    /**
+     * Sobrescribe el método toString() para proporcionar una representación
+     * formateada del auto.
+     * Incluye la información de la superclase (marca, modelo, precio) y el número
+     * de puertas.
+     * 
+     * @return Una cadena formateada que representa el auto.
+     */
+
+    @Override
+    public String toString() {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator(',');
+        symbols.setGroupingSeparator('.');
+        DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
+
+        return "Marca: " + getMarca() + " // Modelo: " + getModelo() + " // Puertas: " + puertas + " // Precio: $"
+                + df.format(getPrecio());
+    }
+}
+Moto
+package SegundaActividad.AguadaGilma.entidades;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor; // Necesario para la herencia con Lombok y un constructor vacío
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+
+/**
+ * Clase que representa una Moto, extendiendo la clase abstracta Vehiculo.
+ * Contiene información específica de una moto, como la cilindrada.
+ */
+
+@Getter // Genera getters para 'cilindrada'
+@NoArgsConstructor // Genera constructor sin argumentos
+@EqualsAndHashCode(callSuper = true) // Incluye campos de la superclase en equals y hashCode
+@ToString(callSuper = true, includeFieldNames = false) // Lombok generará toString, pero lo sobrescribiremos
+public class Moto extends Vehiculo {
+    private String cilindrada;
+
+    /**
+     * Constructor para crear una instancia de Moto.
+     *
+     * @param marca      La marca de la moto.
+     * @param modelo     El modelo de la moto.
+     * @param precio     El precio de la moto.
+     * @param cilindrada La cilindrada de la moto.
+     */
+
+    public Moto(String marca, String modelo, double precio, String cilindrada) {
+        super(marca, modelo, precio); // Llama al constructor de la clase padre
+        this.cilindrada = cilindrada;
+    }
+
+    /**
+     * Sobrescribe el método toString() para proporcionar una representación
+     * formateada de la moto.
+     * Incluye la información de la superclase (marca, modelo, precio) y la
+     * cilindrada.
+     * 
+     * @return Una cadena formateada que representa la moto.
+     */
+
+    @Override
+    public String toString() {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator(',');
+        symbols.setGroupingSeparator('.');
+        DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
+
+        return "Marca: " + getMarca() + " // Modelo: " + getModelo() + " // Cilindrada: " + cilindrada + " // Precio: $"
+                + df.format(getPrecio());
+    }
+}
+CONCESIONARIAService
+package SegundaActividad.AguadaGilma.entidades;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor; // Necesario para la herencia con Lombok y un constructor vacío
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+
+/**
+ * Clase que representa una Moto, extendiendo la clase abstracta Vehiculo.
+ * Contiene información específica de una moto, como la cilindrada.
+ */
+
+@Getter // Genera getters para 'cilindrada'
+@NoArgsConstructor // Genera constructor sin argumentos
+@EqualsAndHashCode(callSuper = true) // Incluye campos de la superclase en equals y hashCode
+@ToString(callSuper = true, includeFieldNames = false) // Lombok generará toString, pero lo sobrescribiremos
+public class Moto extends Vehiculo {
+    private String cilindrada;
+
+    /**
+     * Constructor para crear una instancia de Moto.
+     *
+     * @param marca      La marca de la moto.
+     * @param modelo     El modelo de la moto.
+     * @param precio     El precio de la moto.
+     * @param cilindrada La cilindrada de la moto.
+     */
+
+    public Moto(String marca, String modelo, double precio, String cilindrada) {
+        super(marca, modelo, precio); // Llama al constructor de la clase padre
+        this.cilindrada = cilindrada;
+    }
+
+    /**
+     * Sobrescribe el método toString() para proporcionar una representación
+     * formateada de la moto.
+     * Incluye la información de la superclase (marca, modelo, precio) y la
+     * cilindrada.
+     * 
+     * @return Una cadena formateada que representa la moto.
+     */
+
+    @Override
+    public String toString() {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator(',');
+        symbols.setGroupingSeparator('.');
+        DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
+
+        return "Marca: " + getMarca() + " // Modelo: " + getModelo() + " // Cilindrada: " + cilindrada + " // Precio: $"
+                + df.format(getPrecio());
+    }
+}
+TESTEO
+package SegundaActividad.AguadaGilma.test;
+
+import SegundaActividad.AguadaGilma.entidades.Vehiculo;
+import SegundaActividad.AguadaGilma.entidades.ConcesionariaService;
+import java.util.Scanner; // Nos permite leer la entrada del usuario directamente desde la consola. 
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.List;
+
+/**
+ * Clase principal que simula el funcionamiento de la concesionaria.
+ * Contiene el método main para ejecutar la aplicación y mostrar la salida por
+ * consola.
+ */
+
+public class Concesionaria {
+
+    // Método principal que se ejecuta al iniciar la aplicación.
+    // Realiza las operaciones de la concesionaria y muestra los resultados por
+    // consola.
+
+    public static void main(String[] args) {
+        ConcesionariaService concesionariaService = new ConcesionariaService();
+
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(); // Creamos un objeto symbols que nos permite definir
+                                                                   // cómo se comportan los separadores de números.
+        symbols.setDecimalSeparator(','); // Indicamos que la coma (,) sea el separador para los decimales.
+        symbols.setGroupingSeparator('.'); // Decimos que el punto (.) sea el separador para los grupos de miles.
+        DecimalFormat df = new DecimalFormat("#,##0.00", symbols); // Creamos el formateador de números (df) que va a
+                                                                   // usar el patrón de moneda (#,##0.00)
+                                                                   // y aplicará las reglas de separadores que definimos
+                                                                   // en symbols.
+
+        System.out.println("--- Lista Inicial de Vehículos ---");
+        System.out.println();
+        concesionariaService.imprimirVehiculos(concesionariaService.getVehiculos());
+        System.out.println(); // Añade una línea vacía para más espacio
+        System.out.println("=============================");
+        System.out.println(); // Añade una línea vacía para más espacio
+
+        // 2. Vehículo más caro
+        Vehiculo masCaro = concesionariaService.encontrarVehiculoMasCaro();
+        if (masCaro != null) { // Aseguramos de que solo intentamos trabajar con un vehículo si realmente lo
+                               // encontramos.
+            System.out.println("Vehículo más caro: " + masCaro.getMarca() + " " + masCaro.getModelo());
+        }
+
+        // 3. Vehículo más barato
+        Vehiculo masBarato = concesionariaService.encontrarVehiculoMasBarato();
+        if (masBarato != null) {
+            System.out.println("Vehículo más barato: " + masBarato.getMarca() + " " + masBarato.getModelo());
+        }
+        // Hacer la búsqueda de la letra más genérica
+        // Creamos un objeto Scanner para leer la entrada del usuario
+        Scanner teclado = new Scanner(System.in);
+        System.out.print("Ingrese la letra a buscar en los modelos de vehículos: ");
+        // Leemos la primera letra que ingresa el usuario
+        char letraABuscar = teclado.next().charAt(0);
+
+        System.out.println(); // Salto de línea para separar la entrada del usuario del resultado
+
+        // 4. Vehículo con la letra ingresada en el modelo
+        // Pasamos la variable 'letraABuscar' al método
+        Vehiculo vehiculoConLetra = concesionariaService.encontrarVehiculoConLetraEnModelo(letraABuscar);
+        if (vehiculoConLetra != null) {
+            System.out.println(
+                    "Vehículo que contiene en el modelo la letra ‘" + Character.toUpperCase(letraABuscar) + "’: "
+                            + vehiculoConLetra.getMarca() + " "
+                            + vehiculoConLetra.getModelo()
+                            + " $" + df.format(vehiculoConLetra.getPrecio()));
+        } else {
+            // Un mensaje si no se encuentra ningún vehículo con esa letra
+            System.out.println("No se encontró ningún vehículo con la letra ‘" + Character.toUpperCase(letraABuscar)
+                    + "’ en el modelo.");
+        }
+
+        System.out.println();
+        System.out.println("=============================");
+        System.out.println();
+
+        // 4. Vehículo con la letra 'Y' en el modelo
+        // Vehiculo vehiculoConY =
+        // concesionariaService.encontrarVehiculoConLetraEnModelo('Y');
+        // if (vehiculoConY != null) {
+        // System.out.println("Vehículo que contiene en el modelo la letra ‘Y’: " +
+        // vehiculoConY.getMarca() + " "
+        // + vehiculoConY.getModelo()
+        // + " $" + df.format(vehiculoConY.getPrecio()));
+        // }
+        // System.out.println(); // Añade una línea vacía para más espacio
+        // System.out.println("=============================");
+        // System.out.println(); // Añade una línea vacía para más espacio
+
+        // El resto del código no ha cambiado
+        System.out.println("Vehículos ordenados por precio de mayor a menor:");
+        List<Vehiculo> vehiculosPorPrecioDesc = concesionariaService.ordenarVehiculosPorPrecioDescendente();
+        for (Vehiculo v : vehiculosPorPrecioDesc) {
+            System.out.println(v.getMarca() + " " + v.getModelo());
+        }
+        System.out.println(); // Añade una línea vacía para más espacio
+        System.out.println("=============================");
+        System.out.println(); // Añade una línea vacía para más espacio
+
+        System.out.println("Vehículos ordenados por orden natural (marca, modelo, precio):");
+        List<Vehiculo> vehiculosOrdenNatural = concesionariaService.ordenarVehiculosPorOrdenNatural();
+        concesionariaService.imprimirVehiculos(vehiculosOrdenNatural);
+        System.out.println(); // Añade una línea vacía para más espacio
+        System.out.println("=============================");
+        System.out.println(); // Añade una línea vacía para más espacio
+    }
+}
