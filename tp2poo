@@ -180,58 +180,126 @@ public class Moto extends Vehiculo {
 CONCESIONARIAService
 package SegundaActividad.AguadaGilma.entidades;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor; // Necesario para la herencia con Lombok y un constructor vacío
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import SegundaActividad.AguadaGilma.entidades.Auto;
+import SegundaActividad.AguadaGilma.entidades.Moto;
+import SegundaActividad.AguadaGilma.entidades.Vehiculo;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
- * Clase que representa una Moto, extendiendo la clase abstracta Vehiculo.
- * Contiene información específica de una moto, como la cilindrada.
+ * Clase de servicio que gestiona las operaciones relacionadas con los vehículos
+ * en la concesionaria.
+ * Contiene métodos para cargar, imprimir, buscar y ordenar vehículos.
  */
 
-@Getter // Genera getters para 'cilindrada'
-@NoArgsConstructor // Genera constructor sin argumentos
-@EqualsAndHashCode(callSuper = true) // Incluye campos de la superclase en equals y hashCode
-@ToString(callSuper = true, includeFieldNames = false) // Lombok generará toString, pero lo sobrescribiremos
-public class Moto extends Vehiculo {
-    private String cilindrada;
+public class ConcesionariaService {
+
+    private List<Vehiculo> vehiculos;// Lista interna que almacena todos los vehículos de la concesionaria.
 
     /**
-     * Constructor para crear una instancia de Moto.
-     *
-     * @param marca      La marca de la moto.
-     * @param modelo     El modelo de la moto.
-     * @param precio     El precio de la moto.
-     * @param cilindrada La cilindrada de la moto.
+     * Constructor de ConcesionariaService.
+     * Al instanciarse, carga la lista inicial de vehículos.
      */
 
-    public Moto(String marca, String modelo, double precio, String cilindrada) {
-        super(marca, modelo, precio); // Llama al constructor de la clase padre
-        this.cilindrada = cilindrada;
+    public ConcesionariaService() {
+        this.vehiculos = cargarVehiculos();
     }
 
     /**
-     * Sobrescribe el método toString() para proporcionar una representación
-     * formateada de la moto.
-     * Incluye la información de la superclase (marca, modelo, precio) y la
-     * cilindrada.
-     * 
-     * @return Una cadena formateada que representa la moto.
+     * Carga la lista inicial de vehículos de la concesionaria.
+     * Este método es el único punto donde se inicializan los vehículos, sin
+     * solicitar entrada del usuario.
+     * @return Una lista de objetos Vehiculo precargados.
+     */
+    private List<Vehiculo> cargarVehiculos() {
+        List<Vehiculo> vehiculos = new ArrayList<>();
+        vehiculos.add(new Auto("Peugeot", "206", 200000.00, 4));
+        vehiculos.add(new Moto("Honda", "Titan", 60000.00, "125c"));
+        vehiculos.add(new Auto("Peugeot", "208", 250000.00, 5));
+        vehiculos.add(new Moto("Yamaha", "YBR", 80500.50, "160c"));
+        return vehiculos;
+    }
+
+    /**
+     * Devuelve una copia de la lista de vehículos actual en la concesionaria.
+     * Se devuelve una nueva ArrayList para evitar modificaciones externas directas
+     * a la lista interna.
+     * @return Una lista inmutable de vehículos.
      */
 
-    @Override
-    public String toString() {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-        symbols.setDecimalSeparator(',');
-        symbols.setGroupingSeparator('.');
-        DecimalFormat df = new DecimalFormat("#,##0.00", symbols);
+    public List<Vehiculo> getVehiculos() {
+        return new ArrayList<>(vehiculos);
+    }
+    /**
+     * Imprime cada vehículo de la lista proporcionada en la consola.
+     * Utiliza el método toString() sobrescrito en cada clase de Vehiculo para el formato.
+     * @param lista La lista de objetos Vehiculo a imprimir.
+     */
 
-        return "Marca: " + getMarca() + " // Modelo: " + getModelo() + " // Cilindrada: " + cilindrada + " // Precio: $"
-                + df.format(getPrecio());
+    public void imprimirVehiculos(List<Vehiculo> lista) {
+        for (Vehiculo vehiculo : lista) {
+            System.out.println(vehiculo);
+        }
+    }
+
+    /**
+     * Encuentra el vehículo con el precio más alto en la lista.
+     * Utiliza Streams y Comparator para una búsqueda eficiente.
+     * @return El objeto Vehiculo más caro, o null si la lista de vehículos está vacía.
+     */
+    public Vehiculo encontrarVehiculoMasCaro() {
+
+        return vehiculos.stream()
+                .max(Comparator.comparingDouble(Vehiculo::getPrecio))
+                .orElse(null); // Si la lista está vacía, devuelve null.
+    }
+
+    /**
+     * Encuentra el vehículo con el precio más bajo en la lista.
+     * Utiliza Streams y Comparator para una búsqueda eficiente.
+     * @return El objeto Vehiculo más barato, o null si la lista de vehículos está vacía.
+     */
+    public Vehiculo encontrarVehiculoMasBarato() {
+        return vehiculos.stream()
+                .min(Comparator.comparingDouble(Vehiculo::getPrecio))
+                .orElse(null); // Si la lista está vacía, devuelve null.
+    }
+    /**
+     * Busca un vehículo cuyo modelo contenga la letra especificada (ignorando mayúsculas/minúsculas).
+     * @param letra La letra (char) a buscar en el modelo del vehículo.
+     * @return El primer objeto Vehiculo encontrado que contenga la letra en su modelo, o null si no se encuentra ninguno.
+     */
+   
+    public Vehiculo encontrarVehiculoConLetraEnModelo(char letra) {
+        String letraMayuscula = String.valueOf(Character.toUpperCase(letra));
+        return vehiculos.stream()
+                .filter(v -> v.getModelo().toUpperCase().contains(letraMayuscula))
+                .findFirst()
+                .orElse(null); // Si no encuentra un vehículo, devuelve null.
+    }
+    /**
+     * Ordena la lista de vehículos por precio de mayor a menor (descendente).
+     * Crea una nueva lista para no modificar la lista original.
+     * @return Una nueva lista de Vehiculo ordenada por precio de forma descendente.
+     */
+    public List<Vehiculo> ordenarVehiculosPorPrecioDescendente() {
+        List<Vehiculo> listaOrdenada = new ArrayList<>(vehiculos);
+        Collections.sort(listaOrdenada, (v1, v2) -> Double.compare(v2.getPrecio(), v1.getPrecio()));
+        return listaOrdenada;
+    }
+    /**
+     * Ordena la lista de vehículos por su "orden natural", definido en la implementación de Comparable en la clase Vehiculo.
+     * El orden natural es por marca, luego por modelo y finalmente por precio.
+     * Crea una nueva lista para no modificar la lista original.
+     * @return Una nueva lista de Vehiculo ordenada por su orden natural.
+     */
+    public List<Vehiculo> ordenarVehiculosPorOrdenNatural() {
+        List<Vehiculo> listaOrdenada = new ArrayList<>(vehiculos);
+        Collections.sort(listaOrdenada);
+        return listaOrdenada;
     }
 }
 TESTEO
